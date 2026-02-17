@@ -1,6 +1,6 @@
 
 
-package com.digitalid;
+
 
 public enum IDType {
     PASSPORT,
