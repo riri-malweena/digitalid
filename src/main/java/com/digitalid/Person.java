@@ -3,6 +3,7 @@ package com.digitalid;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -21,9 +22,11 @@ public class Person {
             DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT);
 
     private final Path storageDir;
+    private final Clock clock;
 
-    public Person(Path storageDir) {
+    public Person(Path storageDir, Clock clock) {
         this.storageDir = storageDir;
+        this.clock = clock;
     }
 
     /**
@@ -39,6 +42,13 @@ public class Person {
             String newBirthDate  // DD-MM-YYYY
     ) {
         try {
+
+        if (newBirthDate == null || newBirthDate.isBlank()) return false;
+        if (newPersonId == null || newPersonId.isBlank()) return false;
+        if (newFirstName == null || newFirstName.isBlank()) return false;
+        if (newLastName == null || newLastName.isBlank()) return false;
+        if (newAddress == null || newAddress.isBlank()) return false;
+
             Path file = storageDir.resolve(STORE_FILE);
             if (!Files.exists(file)) return false;
 
@@ -80,7 +90,7 @@ public class Person {
                 String currentAddress =
                         currentStreetNo + SEP + currentStreet + SEP + currentCity + SEP + currentState + SEP + currentCountry;
 
-                // ---------------- Condition 2 (SPEC PERFECT) ----------------
+                // ---------------- Condition 2 ----------------
                 // If DOB changes, then no other detail can change.
                 boolean dobChanged = !newBirthDate.equals(currentDob);
                 if (dobChanged) {
@@ -209,9 +219,10 @@ public class Person {
         }
     }
 
-    private static int getAge(String dob) {
+    // CHANGED: uses clock (stable tests)
+    private int getAge(String dob) {
         LocalDate birth = LocalDate.parse(dob, DOB_FMT);
-        return Period.between(birth, LocalDate.now()).getYears();
+        return Period.between(birth, LocalDate.now(clock)).getYears();
     }
 
     private static boolean personIdExists(List<String> lines, String id) {
@@ -223,3 +234,4 @@ public class Person {
         return false;
     }
 }
+
