@@ -1,7 +1,4 @@
-<<<<<<< HEAD:src/main/java/Person.java
-=======
 package com.digitalid;
->>>>>>> df949283a7351888bb78855c3bf5cafff0df762f:src/main/java/com/digitalid/Person.java
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
