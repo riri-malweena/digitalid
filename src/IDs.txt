@@ -1,1 +1,0 @@
-personId|dateOfBirth|idType|idNumber|issueDate|expiryDate|country
