@@ -1,3 +1,5 @@
+package com.digitalid;
+
 import java.nio.file.Paths;
 
 public class PersonRunner {
