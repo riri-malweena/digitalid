@@ -1,5 +1,4 @@
-public class testAddIDFunction {
-    
+public class testAddIDFunction {  
 
 @Test
 void testAddIDFunction() {
