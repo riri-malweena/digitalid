@@ -7,6 +7,14 @@ import java.time.LocalDate;
 
 public class TestAddID {
 
+// TEST 1 
+        //Verifies that a valid passport ID is accepted.
+
+//The ID number follows the required format (2 uppercase letters + 6 digits).//
+//The applicant is over 18 years old.
+//The expiry date is valid.
+//Expected Result: true
+//Purpose: Confirms correct behaviour for a valid input scenario.
     @Test
     void test1_validPassport() {
         AddID addID = new AddID();
@@ -17,6 +25,17 @@ public class TestAddID {
         System.out.println("Test 1 - Valid Passport: " + (result ? "PASSED" : "FAILED"));
         assertEquals(true, result);
     }
+
+// TEST 2 
+//Tests a driver licence with an invalid format (CD123).
+//Expected Result: false
+
+//However, the current implementation does not fully validate the driver licence format.
+//This test intentionally fails to demonstrate a validation weakness.
+
+//Purpose: Highlights an area where additional validation logic is required.
+//Demonstrates critical testing by identifying a limitation in the current implementation.
+
 
     // intentional fail
     @Test
@@ -30,6 +49,12 @@ public class TestAddID {
         assertEquals(false, result);
     }
 
+
+//TEST 3
+    //Tests a Medicare number containing non-numeric characters.
+//Medicare numbers must contain exactly 9 digits.
+//Expected Result: false
+//Purpose: Confirms format validation is enforced correctly.
     @Test
     void test3_invalidMedicare() {
         AddID addID = new AddID();
@@ -41,6 +66,14 @@ public class TestAddID {
         assertEquals(false, result);
     }
 
+
+// TEST 4 
+//Tests a person under 18 years old attempting to add an ID.
+//Expected Result: false
+//Purpose: Ensures age restrictions are correctly applied.
+
+
+
     @Test
     void test4_under18() {
         AddID addID = new AddID();
@@ -51,6 +84,14 @@ public class TestAddID {
         System.out.println("Test 4 - Under 18: " + (!result ? "PASSED" : "FAILED"));
         assertEquals(false, result);
     }
+
+//TEST 5 
+//First attempt: Valid ID is added successfully.
+//Second attempt: Same ID number is used again.
+//Expected Results:
+//First attempt → true
+//Second attempt → false
+//Purpose: Confirms duplicate IDs are prevented.
 
     @Test
     void test5_duplicateID() {
