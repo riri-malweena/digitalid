@@ -29,6 +29,43 @@ public class Person {
         this.clock = clock;
     }
 
+    public boolean addPerson(
+        String personID,
+        String firstName,
+        String lastName, 
+        String streetNumber,
+        String street,
+        String city,
+        String state,
+        String country,
+        String birthDate
+         ) {
+        
+        String fullAddress = String.join(SEP, streetNumber, street, city, state, country);
+        
+        if (!isValidPersonId(personID) || !isValidAddress(fullAddress) || !isValidBirthDate(birthDate)){
+            return false;
+        }
+
+        try {
+        Path file = storageDir.resolve(STORE_FILE);
+        List<String> lines = Files.exists(file) ? Files.readAllLines(file) : new ArrayList<>();
+
+        if (personIdExists(lines, personID)) return false;
+
+        String newLine = String.join(SEP, personID, firstName, lastName, 
+                                     streetNumber, street, city, state, country, 
+                                     birthDate, "0", "false");
+
+        lines.add(newLine);
+        Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return true;
+    } catch (IOException e) {
+        return false;
+    }
+}
+
+
     /**
      * persons.txt line format:
      * personId|firstName|lastName|streetNumber|street|city|state|country|birthDate|demeritPoints|isSuspended
@@ -198,26 +235,40 @@ public class Person {
 
     // Condition 2: Address rule
     private static boolean isValidAddress(String address) {
-        if (address == null) return false;
-        String[] a = address.split("\\|", -1);
-        if (a.length != 5) return false;
+    if (address == null) return false;
+    
+    String[] parts = address.split("\\|", -1);
+    if (parts.length != 5) return false;
 
-        try { Integer.parseInt(a[0]); }
-        catch (NumberFormatException e) { return false; }
+    String streetNum = parts[0];
+    String street = parts[1];
+    String city = parts[2];
+    String state = parts[3];
+    String country = parts[4];
 
-        return a[3].equals("Victoria");
-    }
+    return streetNum.matches("\\d{1,6}") &&          // Max 6 digits
+           street.matches("[a-zA-Z\\s]+") &&         // Letters/spaces only
+           city.matches("[a-zA-Z\\s]+") &&           // Letters/spaces only
+           state.equalsIgnoreCase("Victoria") &&     // Strict State
+           country.equalsIgnoreCase("Australia");    // Strict Country
+}
 
     // Condition 3: DOB rule
-    private static boolean isValidBirthDate(String dob) {
-        if (dob == null) return false;
-        try {
-            LocalDate.parse(dob, DOB_FMT);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+    private boolean isValidBirthDate(String dob) {
+    if (dob == null || dob.isBlank()) return false;
+    try {
+        // Strict format check (DD-MM-YYYY)
+        LocalDate birth = LocalDate.parse(dob, DOB_FMT);
+        
+        // Age calculation using the class-level clock
+        int age = Period.between(birth, LocalDate.now(clock)).getYears();
+        
+        // Age must be between 18 and 120
+        return age >= 18 && age <= 120;
+    } catch (Exception e) {
+        return false;
     }
+}
 
     // CHANGED: uses clock (stable tests)
     private int getAge(String dob) {
