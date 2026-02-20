@@ -13,11 +13,9 @@ import java.util.List;
 
 public class Person {
 
-    // file lives in the digitalid folder (same level as pom.xml)
     private static final String STORE_FILE = "persons.txt";
     private static final String SEP = "|";
 
-    // Strict DD-MM-YYYY
     private static final DateTimeFormatter DOB_FMT =
             DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT);
 
@@ -33,17 +31,18 @@ public class Person {
         String personID,
         String firstName,
         String lastName, 
-        String streetNumber,
-        String street,
-        String city,
-        String state,
-        String country,
+        String address,
         String birthDate
          ) {
         
-        String fullAddress = String.join(SEP, streetNumber, street, city, state, country);
+        String[] inputs = {personID, firstName, lastName, address, birthDate};
+        for (String s : inputs) {
+            if (s == null || s.isBlank()) {
+                return false;
+            }
+        }
         
-        if (!isValidPersonId(personID) || !isValidAddress(fullAddress) || !isValidBirthDate(birthDate)){
+        if (!isValidPersonId(personID) || !isValidAddress(address) || !isValidBirthDate(birthDate)){
             return false;
         }
 
@@ -53,23 +52,33 @@ public class Person {
 
         if (personIdExists(lines, personID)) return false;
 
-        String newLine = String.join(SEP, personID, firstName, lastName, 
-                                     streetNumber, street, city, state, country, 
-                                     birthDate, "0", "false");
+        String[] addressParts = address.split("\\|", -1);
+
+        String newLine = String.join(SEP,
+            personID,
+            firstName,
+            lastName,
+            addressParts[0], // streetNumber
+            addressParts[1], // street
+            addressParts[2], // city
+            addressParts[3], // state
+            addressParts[4], // country
+            birthDate,
+            "0",          // default demerit points
+            "false"       // default suspended value
+        );
 
         lines.add(newLine);
         Files.write(file, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        
         return true;
-    } catch (IOException e) {
+        
+        } catch (IOException e) {
+        
         return false;
     }
 }
 
-
-    /**
-     * persons.txt line format:
-     * personId|firstName|lastName|streetNumber|street|city|state|country|birthDate|demeritPoints|isSuspended
-     */
     public boolean updatePersonalDetails(
             String existingPersonId,
             String newPersonId,
@@ -257,14 +266,14 @@ public class Person {
     private boolean isValidBirthDate(String dob) {
     if (dob == null || dob.isBlank()) return false;
     try {
-        // Strict format check (DD-MM-YYYY)
+        // Format check (DD-MM-YYYY)
         LocalDate birth = LocalDate.parse(dob, DOB_FMT);
         
-        // Age calculation using the class-level clock
-        int age = Period.between(birth, LocalDate.now(clock)).getYears();
+        // check date
+        LocalDate today = LocalDate.now(clock);
         
-        // Age must be between 18 and 120
-        return age >= 18 && age <= 120;
+        // DOB must be after current date
+        return !birth.isAfter(today);
     } catch (Exception e) {
         return false;
     }

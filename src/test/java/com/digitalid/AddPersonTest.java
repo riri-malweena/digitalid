@@ -15,49 +15,85 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AddPersonTest {
 
-// Add Person for someone with valid ID, street, and birthdate
-// PersonID:
-// 56s_d%&fAB
-// Address:
-// 32|Highland Street|Melbourne|Victoria|Australia.
-// Birthday:
-// 15-11-1990
-// ‘True’ (details added to text file)
+@TempDir
+    Path tempDir;
 
-// Add Person for someone in Queensland
-// PersonID:
-// 56s_d%&fAB
-// Address:
-// 32|Canterbury Street|Brisbane|Queensland|Australia.
-// Birthday:
-// 15-11-1990
-// ‘False’ (no details added)
+    //create person manager w/ recent date (for DOB test)
+    //fixedClock/static so test always returns same value
 
-// Add Person for someone with incorrect birthdate format
-// PersonID:
-// 56s_d%&fAB
-// Address:
-// 32|Highland Street|Melbourne|Victoria|Australia.
-// Birthday:
-// 11-1990
-// ‘False’ (no details added)
+    private Person createPersonManager() {
+        Clock fixedClock = Clock.fixed(
+            LocalDate.of(2026, 2, 10).atStartOfDay(ZoneId.systemDefault()).toInstant(), 
+            ZoneId.systemDefault()
+        );
+        return new Person(tempDir, fixedClock);
+    }
 
-// Add Person for someone whose ID does not have 2 numbers between 2 and 9 at start
-// PersonID:
-// abs_d%&fAB
-// Address:
-// 32|Highland Street|Melbourne|Victoria|Australia.
-// Birthday:
-// 15-11-1990
-// ‘False’ (no details added)
+    @Test
 
-// Add Person for someone whose ID ends with lowercase letters
-// PersonID:
-// 56s_d%&fab
-// Address:
-// 32|Highland Street|Melbourne|Victoria|Australia.
-// Birthday:
-// 15-11-1990
-// ‘False’ (no details added)
+    //valid addPerson
+    //should return true
+    //should add to text file
 
+    void testAddValidPerson() {
+        Person pm = createPersonManager();
+
+        //valid inputs as per examples to ensure correctness
+        boolean result = pm.addPerson("56s_d%&fAB", "John", "Doe", 
+        "32|Highland Street|Melbourne|Victoria|Australia", "15-11-1990");
+        
+        assertTrue(result, "AddPerson Valid Inputs Test should return TRUE");
+        }
+
+    //invalid, state == queensland (not victoria)
+    //should return false
+    //should have no change to text file
+    @Test
+    void testAddPersonInQueenslandReturnsFalse() {
+        Person pm = createPersonManager();
+
+        boolean result = pm.addPerson("56s_d%&fAB", "Jane", "Smith", 
+        "32|Canterbury Street|Brisbane|Queensland|Australia", "15-11-1990");
+        
+        assertFalse(result, "AddPerson Wrong State Test should return FALSE");
+    }
+
+    //invalid, no dd
+    //should return false
+    //should have no change to text file
+    @Test
+    void testAddPersonInvalidBirthDateFormatReturnsFalse() {
+        Person pm = createPersonManager();
+
+        boolean result = pm.addPerson("56s_d%&fAB", "Jane", "Smith",
+        "32|Highland Street|Melbourne|Victoria|Australia", "11-1990");
+        
+        assertFalse(result, "AddPerson Missing DD Test should return FALSE");
+    }
+
+    //invalid, letters for first 2 chars of id
+    //should return false
+    //should have no change to text file
+    @Test
+    void testAddPersonInvalidIdStartReturnsFalse() {
+        Person pm = createPersonManager();
+
+        boolean result = pm.addPerson("abs_d%&fAB", "Jane", "Smith", 
+        "32|Highland Street|Melbourne|Victoria|Australia", "15-11-1990");
+        
+        assertFalse(result, "AddPerson Leading Letters ID Test should return FALSE");
+    }
+
+    //invalid, last two letters lowercase
+    //should return false
+    //should have no change to text file
+    @Test
+    void testAddPersonLowercaseIdEndsReturnsFalse() {
+        Person pm = createPersonManager();
+
+        boolean result = pm.addPerson("56s_d%&fab", "Jane", "Smith",
+         "32|Highland Street|Melbourne|Victoria|Australia", "15-11-1990");
+        
+        assertFalse(result, "AddPerson Lowercase Trailing Letters Test should return FALSE");
+    }
 }
