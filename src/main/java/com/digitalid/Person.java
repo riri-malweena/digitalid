@@ -9,7 +9,9 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Person {
 
@@ -26,6 +28,8 @@ public class Person {
         this.storageDir = storageDir;
         this.clock = clock;
     }
+
+//========================== ADD PERSON ===========================================
 
     public boolean addPerson(
         String personID,
@@ -78,6 +82,8 @@ public class Person {
         return false;
     }
 }
+
+//=============UPDATE PERSONAL DETAILS=====================================
 
     public boolean updatePersonalDetails(
             String existingPersonId,
@@ -219,6 +225,101 @@ public class Person {
         }
     }
 
+// ====================== ADD ID =====================================================
+
+// --- Constant for ID storage file ---
+    private static final String ID_STORE_FILE = "ids.txt";
+
+    /**
+     * addID function. This method stores information about a persons ID in a TXT file.
+     * Based on the provided requirements for Passports, Drivers Licences, Medicare, and Student Cards.
+     */
+    public boolean addID(String personID,
+                         LocalDate dateOfBirth,
+                         IDType idType,
+                         String idNumber,
+                         LocalDate issueDate,
+                         LocalDate expiryDate,
+                         String country) {
+
+        LocalDate today = LocalDate.now(clock);
+
+        // 1️⃣ Age validation (must be 18+ for most IDs, except student cards)
+        // Calculates the age of the applicant based on their date of birth and the current date. 
+        int age = Period.between(dateOfBirth, today).getYears();
+        
+        // 2️⃣ Duplicate ID check
+        // Note: For the file-based version, we check the file instead of a memory Set
+        try {
+            Path idFile = storageDir.resolve(ID_STORE_FILE);
+            if (Files.exists(idFile)) {
+                List<String> existingLines = Files.readAllLines(idFile);
+                for (String line : existingLines) {
+                    if (line.split("\\|")[2].equals(idNumber)) return false; 
+                }
+            }
+        } catch (IOException e) {
+            return false;
+        }
+
+        // 3️⃣ ID Type validation
+
+        // Passport: exactly 8 characters long; 2 letters + 6 digits
+        // Validates the format of a passport ID number. The method checks if the ID number matches the required pattern.
+        if (idType == IDType.PASSPORT) {
+            if (!idNumber.matches("^[A-Z]{2}[0-9]{6}$")) {
+                return false;
+            }
+        }
+
+        // Driver Licence: exactly 10 characters long; 2 letters + 8 digits
+        // Validates the format of a driver licence ID number. 
+        if (idType == IDType.DRIVER_LICENSE) {
+            if (!idNumber.matches("^[A-Z]{2}[0-9]{8}$")) {
+                return false;
+            }
+        }
+
+        // Medicare: must be 9 digits
+        // Validates the format of a Medicare ID number. The method checks if the ID number consists of exactly nine digits.
+        if (idType == IDType.MEDICARE) {
+            if (!idNumber.matches("[0-9]{9}")) {
+                return false;
+            }
+        }
+
+        // Student Card: exactly 12 digits, only if person is under 18
+        // If a person is under 18 a student card can instead be added.
+        if (idType == IDType.STUDENT_ID) {
+            if (age >= 18 || !idNumber.matches("[0-9]{12}")) {
+                return false;
+            }
+        }
+
+        // 4️⃣ Expiry date check
+        // Validates that the expiry date of the ID is in the future.
+        if (expiryDate.isBefore(today)) {
+            return false;
+        }
+
+        // If all checks passed, store ID in TXT file
+        try {
+            Path file = storageDir.resolve(ID_STORE_FILE);
+            List<String> lines = Files.exists(file) ? Files.readAllLines(file) : new ArrayList<>();
+            
+            // Format: personID|idType|idNumber|expiryDate
+            String newLine = String.join(SEP, personID, idType.toString(), idNumber, expiryDate.toString());
+            lines.add(newLine);
+            
+            Files.write(file, lines, StandardCharsets.UTF_8, 
+                        StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+
     // ---------------- Helpers (addPerson validations) ----------------
 
     // Condition 1: ID rule
@@ -280,11 +381,14 @@ public class Person {
 }
 
     // CHANGED: uses clock (stable tests)
+    // Update Personal Details under 18 checker
+
     private int getAge(String dob) {
         LocalDate birth = LocalDate.parse(dob, DOB_FMT);
         return Period.between(birth, LocalDate.now(clock)).getYears();
     }
 
+    // Update Personal Details existing ID checker
     private static boolean personIdExists(List<String> lines, String id) {
         for (String l : lines) {
             if (l == null || l.isBlank()) continue;
