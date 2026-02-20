@@ -247,6 +247,9 @@ public class Person {
         // 1️⃣ Age validation (must be 18+ for most IDs, except student cards)
         // Calculates the age of the applicant based on their date of birth and the current date. 
         int age = Period.between(dateOfBirth, today).getYears();
+        if (age < 18) {
+            return false;
+        }
         
         // 2️⃣ Duplicate ID check
         // Note: For the file-based version, we check the file instead of a memory Set
