@@ -35,6 +35,7 @@ public class Person {
         this.clock = clock;
     }
 
+<<<<<<< HEAD
     // ADD PERSON
     /**
      Stores a new person into persons.txt.
@@ -50,26 +51,56 @@ public class Person {
     ) {
 
         // Quick “no empty input” check
+=======
+//========================== ADD PERSON ===========================================
+
+// Stores information (personID, name, address, birthdate, default demerit + suspension status) in text file if required conditions are met
+
+    public boolean addPerson(
+        String personID,
+        String firstName,
+        String lastName, 
+        String address,
+        String birthDate
+         ) {
+    
+        // Returns false if any inputs are blank or null
+>>>>>>> 0390fdfa1e0849538ee3fe4ccfde48afa6ae630f
         String[] inputs = {personID, firstName, lastName, address, birthDate};
         for (String s : inputs) {
             if (s == null || s.isBlank()) {
                 return false; // reject missing details
             }
         }
+<<<<<<< HEAD
 
         // Validate rules given by spec (ID, address format, and DOB)
         if (!isValidPersonId(personID) || !isValidAddress(address) || !isValidBirthDate(birthDate)) {
+=======
+        
+        // Stores seperated parts of address in string array
+        String[] addressParts = address.split("\\|", -1);
+
+        // Calls helper functions to check if personID, address, and birth date requirements are met 
+        if (!isValidPersonId(personID) || !isValidAddress(addressParts) || !isValidBirthDate(birthDate)){
+>>>>>>> 0390fdfa1e0849538ee3fe4ccfde48afa6ae630f
             return false;
         }
 
+        // If requirements met, attempts to append info to text file
         try {
             Path file = storageDir.resolve(STORE_FILE);
 
             // If the file exists, load it; otherwise start with empty list
             List<String> lines = Files.exists(file) ? Files.readAllLines(file) : new ArrayList<>();
 
+<<<<<<< HEAD
             // Make sure the personID is not already used
             if (personIdExists(lines, personID)) return false;
+=======
+        // Splits address into individual parts for 
+        
+>>>>>>> 0390fdfa1e0849538ee3fe4ccfde48afa6ae630f
 
             // Address is stored as: StreetNumber|Street|City|State|Country
             String[] addressParts = address.split("\\|", -1);
@@ -206,9 +237,16 @@ public class Person {
                     continue;
                 }
 
+<<<<<<< HEAD
                 // If DOB not changing, new values must follow normal rules 
+=======
+                // ---------------- addPerson rules must also pass ----------------
+
+                String[] addressParts = (newAddress != null) ? newAddress.split("\\|", -1) : new String[0];
+
+>>>>>>> 0390fdfa1e0849538ee3fe4ccfde48afa6ae630f
                 if (!isValidPersonId(newPersonId)) return false;
-                if (!isValidAddress(newAddress)) return false;
+                if (!isValidAddress(addressParts)) return false;
                 if (!isValidBirthDate(newBirthDate)) return false;
 
                 // Split new address into fields
@@ -366,6 +404,7 @@ public class Person {
     }
 
 
+<<<<<<< HEAD
     /**
      * Person ID rule:
     length 10
@@ -373,6 +412,11 @@ public class Person {
      chars 3..8 contain at least 2 special characters (not letters/digits)
      last 2 chars are uppercase letters A..Z
      */
+=======
+// ================================== HELPERS =========================================
+
+// CONDITION 2: PERSONID REQUIREMENTS 
+>>>>>>> 0390fdfa1e0849538ee3fe4ccfde48afa6ae630f
     private static boolean isValidPersonId(String id) {
         if (id == null || id.length() != 10) return false;
 
