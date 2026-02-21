@@ -15,19 +15,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UpdatePersonalDetailsTest {
 
-    @TempDir
-    Path tempDir;
+    private final Path testStorage = Path.of("test_data");
+
 
     private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final LocalDate TODAY = LocalDate.of(2026, 2, 18);
 
     private Person personWithFixedToday() {
         Clock fixed = Clock.fixed(TODAY.atStartOfDay(ZONE).toInstant(), ZONE);
-        return new Person(tempDir, fixed);
+        return new Person(testStorage, fixed);
     }
 
     private Path personsFile() {
-        return tempDir.resolve("persons.txt");
+        return testStorage.resolve("persons.txt");
     }
 
     private void writePersons(String... lines) throws Exception {

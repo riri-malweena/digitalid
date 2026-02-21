@@ -1,3 +1,6 @@
+
+// ************** LEGACY - MOVED TO PERSON.java *******************
+
 // package com.digitalid;
 
 // import java.nio.file.Files;

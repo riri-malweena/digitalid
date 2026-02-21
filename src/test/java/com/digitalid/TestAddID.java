@@ -18,8 +18,8 @@ public class TestAddID {
 //The expiry date is valid.
 //Expected Result: true
 //Purpose: Confirms correct behaviour for a valid input scenario.
-    @TempDir
-    Path tempDir;
+    private final Path testStorage = Path.of("test_data");
+
 
     private Person createPersonManager() {
         //set recent fixed date for testing
@@ -27,7 +27,7 @@ public class TestAddID {
             LocalDate.of(2026, 2, 10).atStartOfDay(ZoneId.systemDefault()).toInstant(), 
             ZoneId.systemDefault()
         );
-        return new Person(tempDir, fixedClock);
+        return new Person(testStorage, fixedClock);
     }
 
 @Test

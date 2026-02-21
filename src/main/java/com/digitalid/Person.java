@@ -59,13 +59,11 @@ public class Person {
 
         // If requirements met, attempts to append info to text file
         try {
+        // Checks pathway for text file storage
         Path file = storageDir.resolve(STORE_FILE);
         List<String> lines = Files.exists(file) ? Files.readAllLines(file) : new ArrayList<>();
 
-        if (personIdExists(lines, personID)) return false;
-
-        // Splits address into individual parts for 
-        
+        if (personIdExists(lines, personID)) return false;        
 
         String newLine = String.join(SEP,
             personID,
