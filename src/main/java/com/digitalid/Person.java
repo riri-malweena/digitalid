@@ -31,6 +31,9 @@ public class Person {
 
 //========================== ADD PERSON ===========================================
 
+// Stores information (personID, name, address, birthdate, default demerit + suspension status) in
+// text file if required conditions are met
+
     public boolean addPerson(
         String personID,
         String firstName,
@@ -38,7 +41,8 @@ public class Person {
         String address,
         String birthDate
          ) {
-        
+    
+        // Returns false if any inputs are blank or null
         String[] inputs = {personID, firstName, lastName, address, birthDate};
         for (String s : inputs) {
             if (s == null || s.isBlank()) {
@@ -46,17 +50,23 @@ public class Person {
             }
         }
         
-        if (!isValidPersonId(personID) || !isValidAddress(address) || !isValidBirthDate(birthDate)){
+        // Stores seperated parts of address in string array
+        String[] addressParts = address.split("\\|", -1);
+
+        // Calls helper functions to check if personID, address, and birth date requirements are met 
+        if (!isValidPersonId(personID) || !isValidAddress(addressParts) || !isValidBirthDate(birthDate)){
             return false;
         }
 
+        // If requirements met, attempts to append info to text file
         try {
         Path file = storageDir.resolve(STORE_FILE);
         List<String> lines = Files.exists(file) ? Files.readAllLines(file) : new ArrayList<>();
 
         if (personIdExists(lines, personID)) return false;
 
-        String[] addressParts = address.split("\\|", -1);
+        // Splits address into individual parts for 
+        
 
         String newLine = String.join(SEP,
             personID,
@@ -171,8 +181,11 @@ public class Person {
                 }
 
                 // ---------------- addPerson rules must also pass ----------------
+
+                String[] addressParts = (newAddress != null) ? newAddress.split("\\|", -1) : new String[0];
+
                 if (!isValidPersonId(newPersonId)) return false;
-                if (!isValidAddress(newAddress)) return false;
+                if (!isValidAddress(addressParts)) return false;
                 if (!isValidBirthDate(newBirthDate)) return false;
 
                 String[] addr = newAddress.split("\\|", -1);
@@ -323,9 +336,9 @@ public class Person {
     }
 
 
-    // ---------------- Helpers (addPerson validations) ----------------
+// ================================== HELPERS =========================================
 
-    // Condition 1: ID rule
+// CONDITION 2: PERSONID REQUIREMENTS 
     private static boolean isValidPersonId(String id) {
         if (id == null || id.length() != 10) return false;
 
@@ -346,27 +359,30 @@ public class Person {
         return (last1 >= 'A' && last1 <= 'Z') && (last2 >= 'A' && last2 <= 'Z');
     }
 
-    // Condition 2: Address rule
-    private static boolean isValidAddress(String address) {
-    if (address == null) return false;
+// CONDITION 2: ADDRESS REQUIREMENTS 
+    private static boolean isValidAddress(String[] address) {
     
-    String[] parts = address.split("\\|", -1);
-    if (parts.length != 5) return false;
+    // Checks address has current number of values
+    if (address.length != 5) return false;
 
-    String streetNum = parts[0];
-    String street = parts[1];
-    String city = parts[2];
-    String state = parts[3];
-    String country = parts[4];
+    // Assumes inputted address is in streetnum/street/city/state/country format
+    // Will fail if address is correct but in different order
+    String streetNum = address[0];
+    String street = address[1];
+    String city = address[2];
+    String state = address[3];
+    String country = address[4];
 
-    return streetNum.matches("\\d{1,6}") &&          // Max 6 digits
-           street.matches("[a-zA-Z\\s]+") &&         // Letters/spaces only
-           city.matches("[a-zA-Z\\s]+") &&           // Letters/spaces only
-           state.equalsIgnoreCase("Victoria") &&     // Strict State
-           country.equalsIgnoreCase("Australia");    // Strict Country
+    // Returns true if all requirements met and false if not
+    return streetNum.matches("\\d{1,6}") &&          // Street number must be a digit with at least 1 and no more than 6 characters
+           street.matches("[a-zA-Z\\s]+") &&         // Street and City must only have letters (no numbers or special characters)
+           city.matches("[a-zA-Z\\s]+") &&          
+           state.matches("(?i)Victoria|Vic") &&     // State must be Victoria, accomodates capitilisation (victoria) and shorthand (vic)
+           country.equalsIgnoreCase("Australia");    // Country must be 'Australia' regardless of capitilisation
+                                                                    // Does not accomodate shorthand (aus) as could be different country
 }
 
-    // Condition 3: DOB rule
+// CONDITION 3: DOB REQUIREMENTS
     private boolean isValidBirthDate(String dob) {
     if (dob == null || dob.isBlank()) return false;
     try {
