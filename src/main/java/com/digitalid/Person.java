@@ -31,8 +31,7 @@ public class Person {
 
 //========================== ADD PERSON ===========================================
 
-// Stores information (personID, name, address, birthdate, default demerit + suspension status) in
-// text file if required conditions are met
+// Stores information (personID, name, address, birthdate, default demerit + suspension status) in text file if required conditions are met
 
     public boolean addPerson(
         String personID,
