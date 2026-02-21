@@ -45,7 +45,7 @@ public class AddPersonTest {
         Person pm = createPersonManager();
 
         // Calls AddPerson with valid inputs and stores true/false outcome
-        boolean result = pm.addPerson("56s_d%&fAB", "John", "Doe", 
+        boolean result = pm.addPerson("56s_d%&fAB", "Jane", "Doe", 
         "32|Highland Street|Melbourne|Victoria|Australia", "15-11-1990");
         
         // Outcome should be TRUE
