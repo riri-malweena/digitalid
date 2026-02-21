@@ -59,13 +59,11 @@ public class UpdatePersonalDetailsTest {
 
         Person p = personWithFixedToday();
 
-        // =========================================================
         // Test Case 1: Update name for person over 18 years old
         // Test Data: PersonID=56s_d%&fAB, DOB=15-11-2000,
         //           NewFirstName=Mila, NewLastName=Tran,
         //           Address unchanged, Birthday unchanged
         // Expected: returns true
-        // =========================================================
         writePersons(line(PERSON_ID_ODD, "Amy", "Lee", ADDR_1, "15-11-2000", "7", "false"));
 
         boolean tc1 = p.updatePersonalDetails(
@@ -79,12 +77,12 @@ public class UpdatePersonalDetailsTest {
 
         assertEquals(true, tc1);
 
-        // =========================================================
+
         // Test Case 2: Attempt to change address for person under 18
         // Test Data: PersonID=56s_d%&fAB, DOB=15-11-2010,
         //           NewAddress=99|King Street|Melbourne|Victoria|Australia
         // Expected: returns false
-        // =========================================================
+       
         writePersons(line(PERSON_ID_ODD, "Sam", "Young", ADDR_1, "15-11-2010", "0", "false"));
 
         boolean tc2 = p.updatePersonalDetails(
@@ -98,12 +96,10 @@ public class UpdatePersonalDetailsTest {
 
         assertEquals(false, tc2);
 
-        // =========================================================
         // Test Case 3: Change birthday only
         // Test Data: PersonID=56s_d%&fAB, OldDOB=15-11-2000, NewDOB=15-11-2001,
         //           No other fields changed
         // Expected: returns true
-        // =========================================================
         writePersons(line(PERSON_ID_ODD, "Nina", "Park", ADDR_1, "15-11-2000", "3", "true"));
 
         boolean tc3 = p.updatePersonalDetails(
@@ -117,11 +113,10 @@ public class UpdatePersonalDetailsTest {
 
         assertEquals(true, tc3);
 
-        // =========================================================
+    
         // Test Case 4: Attempt to change birthday and address together
         // Test Data: PersonID=56s_d%&fAB, NewDOB=15-11-2001, NewAddress=99|King Street|...
         // Expected: returns false
-        // =========================================================
         writePersons(line(PERSON_ID_ODD, "Nina", "Park", ADDR_1, "15-11-2000", "3", "true"));
 
         boolean tc4 = p.updatePersonalDetails(
@@ -135,11 +130,10 @@ public class UpdatePersonalDetailsTest {
 
         assertEquals(false, tc4);
 
-        // =========================================================
+     
         // Test Case 5: Attempt to change ID when first digit is even
         // Test Data: Existing PersonID=26s_d%&fAB, NewPersonID=56s_d%&fAB
         // Expected: returns false
-        // =========================================================
         writePersons(line(PERSON_ID_EVEN, "John", "Even", ADDR_1, "15-11-2000", "1", "false"));
 
         boolean tc5 = p.updatePersonalDetails(
