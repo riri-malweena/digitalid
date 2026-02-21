@@ -17,7 +17,6 @@ public class UpdatePersonalDetailsTest {
 
     private final Path testStorage = Path.of("test_data");
 
-
     private static final ZoneId ZONE = ZoneId.systemDefault();
     private static final LocalDate TODAY = LocalDate.of(2026, 2, 18);
 
